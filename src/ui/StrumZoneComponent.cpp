@@ -8,12 +8,24 @@ namespace
 {
     // Drag speed (px/ms) that reaches the velocity ceiling at 1x sensitivity.
     constexpr float kReferenceSpeed = 3.0f;
+
+    // Fraction of the zone height kept clear above and below the string
+    // lines as swing-through room.
+    constexpr float kStringInset = 0.18f;
 }
 
 StrumZoneComponent::StrumZoneComponent (VirtualFretProcessor& processorIn)
     : processor (processorIn)
 {
     setOpaque (true);
+}
+
+float StrumZoneComponent::stringLineY (int row, int numStrings) const
+{
+    const float height = (float) getHeight();
+    const float margin = height * kStringInset;
+    const float inner = height - margin * 2.0f;
+    return margin + ((float) row + 0.5f) * inner / (float) juce::jmax (1, numStrings);
 }
 
 void StrumZoneComponent::paint (juce::Graphics& g)
@@ -37,7 +49,7 @@ void StrumZoneComponent::paint (juce::Graphics& g)
     for (int s = 0; s < numStrings; ++s)
     {
         const int row = ui::stringToRow (s, numStrings);
-        const float y = ui::stringRowY (row, numStrings, height);
+        const float y = stringLineY (row, numStrings);
         const float thickness = ui::stringThickness (s, numStrings);
 
         // Momentary pick flash, fading over flashMs — deliberately not
@@ -170,7 +182,7 @@ void StrumZoneComponent::mouseDrag (const juce::MouseEvent& e)
     juce::Array<Crossing> crossings;
     for (int row = 0; row < numStrings; ++row)
     {
-        const float lineY = ui::stringRowY (row, numStrings, (float) getHeight());
+        const float lineY = stringLineY (row, numStrings);
         const float lo = juce::jmin (y0, y1);
         const float hi = juce::jmax (y0, y1);
         if (lineY > lo && lineY <= hi)

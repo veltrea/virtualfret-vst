@@ -151,6 +151,7 @@ A permanent vertical strip to the right of the fretboard — the metaphor is the
 - **Let ring**: strummed notes keep sounding after mouse-up. A string's previous note is released when that string sounds again
 - **Zone feedback**: a string flashes briefly the instant it is picked and fades right back; it never stays lit while a note rings, so rapid alternating up/down strokes each read as their own hit
 - **Hold-light option** (settings, default OFF): picked strings stay lit for the rest of the stroke and all go dark on mouse-up. Keyboard strums always use the flash behaviour
+- **String spacing inside the zone**: the zone's string lines are pulled toward the vertical centre, tighter than the fretboard rows (about 18% swing-through room above and below). Strokes travel less, and overshooting the lowest string no longer carries the pointer out of the window onto whatever sits below
 - **Mute all**:
   - Click & release inside the strum zone without crossing any string = mute all (resting the pick on the strings)
   - Toolbar mute button; Esc key

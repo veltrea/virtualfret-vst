@@ -21,6 +21,11 @@ namespace virtualfret
     each read as their own hit. With the hold-light option, picked
     strings instead stay lit for the rest of the stroke and all go dark
     on mouse-up.
+
+    Inside the zone the string lines are pulled toward the vertical
+    centre (tighter than the fretboard rows): strokes travel less, and
+    the swing-through margins keep a stroke that overshoots the lowest
+    string from leaving the window and clicking whatever is below.
 */
 class StrumZoneComponent : public juce::Component,
                            private juce::Timer
@@ -47,6 +52,10 @@ private:
     /** Schedules the pick flash for a string, `delayMs` from now (to
         match keyboard strums, whose notes start staggered). */
     void markHit (int stringIndex, double delayMs);
+
+    /** Y of a string line inside the zone — compressed toward the
+        centre, unlike the fretboard's full-height rows. */
+    float stringLineY (int row, int numStrings) const;
 
     int velocityForSpeed (float pxPerMs) const;
 
