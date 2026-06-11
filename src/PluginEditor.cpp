@@ -106,7 +106,26 @@ VirtualFretEditor::~VirtualFretEditor()
     // notes hanging downstream.
     virtualFret.requestAllNotesOff();
     virtualFret.removeChangeListener (this);
+    if (keyListenerTarget != nullptr)
+        keyListenerTarget->removeKeyListener (this);
     setLookAndFeel (nullptr);
+}
+
+void VirtualFretEditor::parentHierarchyChanged()
+{
+    // Key events go to the top-level window when nothing inside has the
+    // focus, so listen there: Esc (mute) and Space (strum) then work no
+    // matter where the focus sits. Focused text editors still consume
+    // their keys first, so typing is unaffected.
+    auto* top = getTopLevelComponent();
+    if (top == keyListenerTarget.getComponent() || top == this)
+        return;
+
+    if (keyListenerTarget != nullptr)
+        keyListenerTarget->removeKeyListener (this);
+    keyListenerTarget = top;
+    if (keyListenerTarget != nullptr)
+        keyListenerTarget->addKeyListener (this);
 }
 
 void VirtualFretEditor::paint (juce::Graphics& g)
@@ -154,6 +173,15 @@ void VirtualFretEditor::changeListenerCallback (juce::ChangeBroadcaster*)
 
 void VirtualFretEditor::timerCallback()
 {
+    // The whole editor is covered by child components, so the background
+    // mouseDown grab almost never fires; claim the focus once we are
+    // actually on screen so Esc/Space work immediately.
+    if (! grabbedInitialFocus && isShowing())
+    {
+        grabKeyboardFocus();
+        grabbedInitialFocus = true;
+    }
+
     bool changed = false;
 
     for (int s = 0; s < kMaxStrings; ++s)
@@ -176,10 +204,7 @@ void VirtualFretEditor::timerCallback()
     }
 
     if (changed)
-    {
-        fretboard.repaint();
-        strumZone.repaint();
-    }
+        fretboard.repaint();   // the strum zone animates its own pick flashes
 }
 
 void VirtualFretEditor::refreshAll()

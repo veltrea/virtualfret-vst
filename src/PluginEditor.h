@@ -21,7 +21,8 @@ namespace virtualfret
 */
 class VirtualFretEditor : public juce::AudioProcessorEditor,
                           private juce::ChangeListener,
-                          private juce::Timer
+                          private juce::Timer,
+                          private juce::KeyListener
 {
 public:
     explicit VirtualFretEditor (VirtualFretProcessor&);
@@ -31,10 +32,18 @@ public:
     void resized() override;
     bool keyPressed (const juce::KeyPress&) override;
     void mouseDown (const juce::MouseEvent&) override;
+    void parentHierarchyChanged() override;
 
 private:
     void changeListenerCallback (juce::ChangeBroadcaster*) override;
     void timerCallback() override;
+
+    /** KeyListener hook (registered on the top-level window so Esc/Space
+        work wherever the focus sits). Delegates to keyPressed above. */
+    bool keyPressed (const juce::KeyPress& key, juce::Component*) override
+    {
+        return keyPressed (key);
+    }
 
     void refreshAll();
     void refreshTuningList();
@@ -68,6 +77,8 @@ private:
 
     std::array<int, kMaxStrings> lastSounding {};
     std::array<bool, 128> lastInput {};
+    bool grabbedInitialFocus = false;
+    juce::Component::SafePointer<juce::Component> keyListenerTarget;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VirtualFretEditor)
 };

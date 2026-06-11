@@ -248,6 +248,11 @@ void FretboardComponent::paint (juce::Graphics& g)
 
 void FretboardComponent::mouseDown (const juce::MouseEvent& e)
 {
+    // Children cover the whole editor, so route the keyboard focus up —
+    // Esc (mute) and Space (strum) should work right after any click.
+    if (auto* editor = findParentComponentOfClass<juce::AudioProcessorEditor>())
+        editor->grabKeyboardFocus();
+
     const auto cell = cellAt (e.position);
     if (! cell.valid())
         return;

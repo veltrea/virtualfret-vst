@@ -109,6 +109,9 @@ void HeadstockComponent::applyDelta (int stringIndex, int deltaSemitones)
 
 void HeadstockComponent::mouseDown (const juce::MouseEvent& e)
 {
+    if (auto* editor = findParentComponentOfClass<juce::AudioProcessorEditor>())
+        editor->grabKeyboardFocus();   // keep Esc/Space live after tuning edits
+
     int numStrings = 6;
     {
         const juce::ScopedLock sl (processor.getStateLock());

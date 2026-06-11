@@ -149,6 +149,7 @@ A permanent vertical strip to the right of the fretboard — the metaphor is the
 - **Timing**: the actual crossing time is kept and mapped to sample offsets (§5), so drag speed directly becomes stroke speed
 - **Velocity**: derived from crossing speed (px/ms). Settings: sensitivity, min / max, fixed-value mode
 - **Let ring**: strummed notes keep sounding after mouse-up. A string's previous note is released when that string sounds again
+- **Zone feedback**: a string flashes briefly the instant it is picked and fades right back; it never stays lit while a note rings, so rapid alternating up/down strokes each read as their own hit
 - **Mute all**:
   - Click & release inside the strum zone without crossing any string = mute all (resting the pick on the strings)
   - Toolbar mute button; Esc key

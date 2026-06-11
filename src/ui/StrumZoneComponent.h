@@ -15,8 +15,13 @@ namespace virtualfret
     sent as stroke-relative offsets so the processor can spread them
     across sample offsets. A click that crosses nothing is the
     pick-mute gesture: all notes off.
+
+    Strings flash amber for an instant when picked and fade right back
+    (they do not stay lit while a note rings) so rapid up/down strokes
+    each read as their own hit.
 */
-class StrumZoneComponent : public juce::Component
+class StrumZoneComponent : public juce::Component,
+                           private juce::Timer
 {
 public:
     explicit StrumZoneComponent (VirtualFretProcessor& processorIn);
@@ -30,9 +35,16 @@ public:
     void mouseUp (const juce::MouseEvent&) override;
 
 private:
+    void timerCallback() override;
+
     /** Sounds string `stringIndex` as part of the current stroke, if it
-        has a note to play (chord mode skips muted strings). */
-    void strumString (int stringIndex, float relMs, int velocity);
+        has a note to play (chord mode skips muted strings). Returns
+        true when a note was actually queued. */
+    bool strumString (int stringIndex, float relMs, int velocity);
+
+    /** Schedules the pick flash for a string, `delayMs` from now (to
+        match keyboard strums, whose notes start staggered). */
+    void markHit (int stringIndex, double delayMs);
 
     int velocityForSpeed (float pxPerMs) const;
 
@@ -43,6 +55,9 @@ private:
     float lastY = 0.0f;
     double lastMs = 0.0;
     bool crossedAny = false;
+
+    static constexpr double flashMs = 120.0;
+    double hitAtMs[kMaxStrings] = {};   // absolute time of each string's last pick
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StrumZoneComponent)
 };

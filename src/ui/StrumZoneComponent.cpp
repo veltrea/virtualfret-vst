@@ -28,6 +28,7 @@ void StrumZoneComponent::paint (juce::Graphics& g)
 
     const auto width = (float) getWidth();
     const auto height = (float) getHeight();
+    const double nowMs = juce::Time::getMillisecondCounterHiRes();
 
     // soundhole-ish accent: a vertical pickup bar
     g.setColour (theme::c (theme::hairline));
@@ -39,14 +40,40 @@ void StrumZoneComponent::paint (juce::Graphics& g)
         const float y = ui::stringRowY (row, numStrings, height);
         const float thickness = ui::stringThickness (s, numStrings);
 
-        const bool sounding = processor.soundingNote[(size_t) s].load (std::memory_order_relaxed) >= 0;
-        g.setColour (sounding ? theme::c (theme::accent)
-                              : theme::c (theme::stringCol));
+        // Momentary pick flash, fading over flashMs — deliberately not
+        // tied to the (let-ring) sounding state, which would leave every
+        // string lit after one downstroke.
+        auto colour = theme::c (theme::stringCol);
+        const double age = nowMs - hitAtMs[s];
+        if (age >= 0.0 && age < flashMs)
+            colour = colour.interpolatedWith (theme::c (theme::accent),
+                                              1.0f - (float) (age / flashMs));
+        g.setColour (colour);
         g.fillRect (0.0f, y - thickness * 0.5f, width, thickness);
     }
 
     g.setColour (theme::c (theme::hairline));
     g.drawRect (getLocalBounds());
+}
+
+void StrumZoneComponent::markHit (int stringIndex, double delayMs)
+{
+    if (! juce::isPositiveAndBelow (stringIndex, kMaxStrings))
+        return;
+    hitAtMs[stringIndex] = juce::Time::getMillisecondCounterHiRes() + delayMs;
+    startTimerHz (60);   // animate the fade; stops itself when done
+    repaint();
+}
+
+void StrumZoneComponent::timerCallback()
+{
+    const double nowMs = juce::Time::getMillisecondCounterHiRes();
+    bool active = false;
+    for (auto t : hitAtMs)
+        active = active || (nowMs - t < flashMs);   // pending (future) hits count too
+    repaint();
+    if (! active)
+        stopTimer();
 }
 
 int StrumZoneComponent::velocityForSpeed (float pxPerMs) const
@@ -63,7 +90,7 @@ int StrumZoneComponent::velocityForSpeed (float pxPerMs) const
     return juce::jlimit (1, 127, state.strumVelMin + (int) std::lround (norm * (float) span));
 }
 
-void StrumZoneComponent::strumString (int stringIndex, float relMs, int velocity)
+bool StrumZoneComponent::strumString (int stringIndex, float relMs, int velocity)
 {
     int note = -1;
     {
@@ -83,12 +110,18 @@ void StrumZoneComponent::strumString (int stringIndex, float relMs, int velocity
         }
     }
 
-    if (note >= 0)
-        processor.strumNote (stringIndex, note, velocity, relMs, strokeId);
+    if (note < 0)
+        return false;
+
+    processor.strumNote (stringIndex, note, velocity, relMs, strokeId);
+    return true;
 }
 
 void StrumZoneComponent::mouseDown (const juce::MouseEvent& e)
 {
+    if (auto* editor = findParentComponentOfClass<juce::AudioProcessorEditor>())
+        editor->grabKeyboardFocus();   // keep Esc/Space live after strumming
+
     // Arm the pick: silent until a string line is crossed.
     ++strokeId;
     strokeStartMs = juce::Time::getMillisecondCounterHiRes();
@@ -138,7 +171,8 @@ void StrumZoneComponent::mouseDrag (const juce::MouseEvent& e)
     for (const auto& crossing : crossings)
     {
         const double tMs = lastMs + (double) ((crossing.lineY - y0) / (y1 - y0)) * dtMs;
-        strumString (crossing.string, (float) (tMs - strokeStartMs), velocity);
+        if (strumString (crossing.string, (float) (tMs - strokeStartMs), velocity))
+            markHit (crossing.string, 0.0);
         crossedAny = true;
     }
 
@@ -175,26 +209,9 @@ void StrumZoneComponent::performKeyboardStroke (bool downstroke)
     for (int i = 0; i < numStrings; ++i)
     {
         const int s = downstroke ? i : numStrings - 1 - i;
-
-        int note = -1;
+        if (strumString (s, (float) (emitted * gapMs), velocity))
         {
-            const juce::ScopedLock sl (processor.getStateLock());
-            const auto& state = processor.getModel();
-            if (state.chordMode)
-            {
-                const int fret = s < state.latch.size() ? state.latch[s] : -1;
-                if (fret >= 0)
-                    note = state.noteForCell (s, fret);
-            }
-            else
-            {
-                note = state.noteForCell (s, 0);
-            }
-        }
-
-        if (note >= 0)
-        {
-            processor.strumNote (s, note, velocity, (float) (emitted * gapMs), strokeId);
+            markHit (s, (double) (emitted * gapMs));   // flash in step with the stagger
             ++emitted;
         }
     }
