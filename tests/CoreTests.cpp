@@ -104,6 +104,7 @@ static void testStateJsonRoundTrip()
     state.inputHighlight = false;
     state.latchAudition = false;
     state.visibleFrets = 15;
+    state.leftHanded = true;
     state.language = "ja";
 
     VirtualFretState restored;
@@ -127,6 +128,7 @@ static void testStateJsonRoundTrip()
     EXPECT (! restored.inputHighlight);
     EXPECT (! restored.latchAudition);
     EXPECT_EQ (restored.visibleFrets, 15);
+    EXPECT (restored.leftHanded);
     EXPECT_EQ (restored.language, juce::String ("ja"));
 
     // States without the field fall back to the default zoom (18).

@@ -137,8 +137,25 @@ void VirtualFretEditor::resized()
 {
     auto bounds = getLocalBounds();
     toolbar.setBounds (bounds.removeFromTop (58));
-    headstock.setBounds (bounds.removeFromLeft (56));
-    strumZone.setBounds (bounds.removeFromRight (64));
+
+    bool lefty = false;
+    {
+        const juce::ScopedLock sl (virtualFret.getStateLock());
+        lefty = virtualFret.getModel().leftHanded;
+    }
+
+    // Left-handed mode mirrors the whole board: strum zone on the left,
+    // headstock on the right (the fretboard mirrors itself internally).
+    if (lefty)
+    {
+        strumZone.setBounds (bounds.removeFromLeft (64));
+        headstock.setBounds (bounds.removeFromRight (56));
+    }
+    else
+    {
+        headstock.setBounds (bounds.removeFromLeft (56));
+        strumZone.setBounds (bounds.removeFromRight (64));
+    }
     fretboard.setBounds (bounds);
 }
 
@@ -234,6 +251,7 @@ void VirtualFretEditor::refreshAll()
     refreshTuningList();
     refreshFormLabel();
 
+    resized();   // the left-handed option swaps the side panels
     headstock.repaint();
     fretboard.repaint();
     strumZone.repaint();
@@ -503,6 +521,7 @@ void VirtualFretEditor::showSettingsMenu()
     menu.addItem (3, i18n::tr (lang, "latchAudition"), true, snapshot.latchAudition);
     menu.addItem (4, i18n::tr (lang, "strumFixedVel"), true, snapshot.strumFixedVelocity);
     menu.addItem (5, i18n::tr (lang, "strumHoldLight"), true, snapshot.strumHoldLight);
+    menu.addItem (6, i18n::tr (lang, "leftHanded"), true, snapshot.leftHanded);
 
     juce::PopupMenu sensitivity;
     const float levels[] = { 0.5f, 1.0f, 2.0f, 4.0f };
@@ -540,6 +559,7 @@ void VirtualFretEditor::showSettingsMenu()
                     case 3: state.latchAudition = ! state.latchAudition; break;
                     case 4: state.strumFixedVelocity = ! state.strumFixedVelocity; break;
                     case 5: state.strumHoldLight = ! state.strumHoldLight; break;
+                    case 6: state.leftHanded = ! state.leftHanded; break;
                     case 10: state.strumSensitivity = 0.5f; break;
                     case 11: state.strumSensitivity = 1.0f; break;
                     case 12: state.strumSensitivity = 2.0f; break;

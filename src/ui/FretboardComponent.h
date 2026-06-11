@@ -49,6 +49,9 @@ private:
     };
 
     Cell cellAt (juce::Point<float> p);
+
+    /** Cell centre in component coords, already mirrored when the
+        left-handed option is on. */
     float cellCentreX (int fret) const;
 
     /** Lazily rebuilds fret geometry when the zoom (visible frets) or
@@ -57,10 +60,13 @@ private:
 
     VirtualFretProcessor& processor;
 
+    // Geometry is always built right-handed (nut on the left); the
+    // `mirrored` flag flips drawing and hit-testing for lefties.
     float fretX[kNumFrets + 1] = {};   // fretX[0] = nut; fretX[f] = wire right of fret f
     float openZoneWidth = 46.0f;
     int builtFrets = 0;                // last zoom the geometry was built for
     float builtWidth = -1.0f;
+    bool mirrored = false;             // refreshed from the state on paint/hit-test
 
     Cell pressed;              // melodic press in progress
     Cell hover;

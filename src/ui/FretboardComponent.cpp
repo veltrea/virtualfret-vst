@@ -48,9 +48,9 @@ void FretboardComponent::ensureGeometry (int visibleFrets)
 
 float FretboardComponent::cellCentreX (int fret) const
 {
-    if (fret <= 0)
-        return openZoneWidth * 0.5f;
-    return (fretX[fret - 1] + fretX[fret]) * 0.5f;
+    const float raw = fret <= 0 ? openZoneWidth * 0.5f
+                                : (fretX[fret - 1] + fretX[fret]) * 0.5f;
+    return mirrored ? (float) getWidth() - raw : raw;
 }
 
 FretboardComponent::Cell FretboardComponent::cellAt (juce::Point<float> p)
@@ -63,6 +63,7 @@ FretboardComponent::Cell FretboardComponent::cellAt (juce::Point<float> p)
         const juce::ScopedLock sl (processor.getStateLock());
         numStrings = processor.getModel().numStrings;
         visibleFrets = processor.getModel().visibleFrets;
+        mirrored = processor.getModel().leftHanded;
     }
     ensureGeometry (visibleFrets);
 
@@ -71,7 +72,9 @@ FretboardComponent::Cell FretboardComponent::cellAt (juce::Point<float> p)
                                   numStrings, (float) getHeight());
     cell.string = ui::rowToString (row, numStrings);
 
-    const float x = juce::jlimit (0.0f, fretX[builtFrets], p.x);
+    // Map the pointer into the right-handed geometry before hit-testing.
+    const float px = mirrored ? (float) getWidth() - p.x : p.x;
+    const float x = juce::jlimit (0.0f, fretX[builtFrets], px);
     cell.fret = 0;
     for (int f = 1; f <= builtFrets; ++f)
     {
@@ -93,12 +96,17 @@ void FretboardComponent::paint (juce::Graphics& g)
     }
     const int numStrings = snapshot.numStrings;
     const auto height = (float) getHeight();
+    const auto width = (float) getWidth();
+    mirrored = snapshot.leftHanded;
     ensureGeometry (snapshot.visibleFrets);
+
+    // mirror helper for x positions stored in right-handed geometry
+    const auto mapX = [this, width] (float x) { return mirrored ? width - x : x; };
 
     // -- board ------------------------------------------------------------
     g.fillAll (theme::c (theme::well));
     g.setColour (theme::c (theme::openZone));
-    g.fillRect (0.0f, 0.0f, openZoneWidth, height);
+    g.fillRect (mirrored ? width - openZoneWidth : 0.0f, 0.0f, openZoneWidth, height);
 
     // position markers (between fret wires, vertically centred)
     for (int f = 1; f <= builtFrets; ++f)
@@ -124,9 +132,9 @@ void FretboardComponent::paint (juce::Graphics& g)
     // fret wires + nut
     g.setColour (theme::c (theme::fretWire));
     for (int f = 1; f <= builtFrets; ++f)
-        g.fillRect (fretX[f] - 1.0f, 0.0f, 2.0f, height);
+        g.fillRect (mapX (fretX[f]) - 1.0f, 0.0f, 2.0f, height);
     g.setColour (theme::c (theme::nut));
-    g.fillRect (fretX[0] - 2.0f, 0.0f, 4.0f, height);
+    g.fillRect (mapX (fretX[0]) - 2.0f, 0.0f, 4.0f, height);
 
     // strings
     for (int s = 0; s < numStrings; ++s)
@@ -190,7 +198,7 @@ void FretboardComponent::paint (juce::Graphics& g)
                 // muted string: x in the open zone
                 g.setColour (theme::c (theme::textGhost));
                 const float r = dotR * 0.55f;
-                const float cx = openZoneWidth * 0.5f;
+                const float cx = cellCentreX (0);
                 g.drawLine (cx - r, y - r, cx + r, y + r, 1.6f);
                 g.drawLine (cx - r, y + r, cx + r, y - r, 1.6f);
             }
@@ -198,7 +206,7 @@ void FretboardComponent::paint (juce::Graphics& g)
             {
                 // open string: ring in the open zone
                 g.setColour (theme::c (theme::accent));
-                g.drawEllipse (openZoneWidth * 0.5f - dotR * 0.75f, y - dotR * 0.75f,
+                g.drawEllipse (cellCentreX (0) - dotR * 0.75f, y - dotR * 0.75f,
                                dotR * 1.5f, dotR * 1.5f, 1.8f);
             }
             else if (fret <= builtFrets)

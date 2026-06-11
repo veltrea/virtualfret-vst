@@ -18,6 +18,7 @@ Built for guitarists who think in fretboard positions, not piano keys: enter MID
 - **Channel modes**: single channel, or per-string channels for guitar instruments that understand them
 - **Input MIDI highlight**: incoming notes light up every fretboard position that could play them
 - **Compact view**: choose how many frets fill the window (12 / 15 / 18 / 21 / 24) in Settings, and shrink the window down to a slim Guitar-Pro-style fretboard strip
+- **Left-handed mode**: mirror the whole board (headstock right, strum zone left) from Settings
 - **UI languages**: English / 日本語 (follows the OS, switchable in Settings)
 
 ## Requirements

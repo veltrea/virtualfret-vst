@@ -28,7 +28,7 @@ The technical foundation reuses the MIDI-output VST3 patterns established in Not
 - **Bends / slides / vibrato / MPE** — articulation is a future candidate (v1 sends note on/off only)
 - **Arpeggiator / strum-pattern sequencing** — future candidate; v1 strums are manual gestures only
 - **Tablature import or playback**
-- **Left-handed / flipped display** — post-v1
+- **Flipped display (reversed string order)** — post-v1. The horizontally mirrored left-handed mode is implemented (§6)
 - **Dedicated capo UI** — covered by tuning (uniform offset across strings); future candidate
 - Audio processing; transforming CC / pitch bend / anything else
 
@@ -67,6 +67,7 @@ Apply the full checklist from `vst3_midi_out_plugin.md`:
 - **String order**: top = string 1 (highest), bottom = lowest string (same as tablature)
 - **Frets**: open (an open-string zone left of the nut) + frets 1–24
 - **Frets shown (zoom)**: a view option chooses how many frets fill the width (12 / 15 / 18 / 21 / 24, default 18). The data model always spans 24 frets — positions beyond the visible range still sound (strums, presets), they are just not drawn
+- **Left-handed mode** (settings, default OFF): mirrors the whole board horizontally — headstock on the right, strum zone on the left, fret 1 at the right edge. The vertical string order (tab orientation) is unchanged. Purely a view/input flip; the data model is untouched
 - **Position markers**: 3 / 5 / 7 / 9 / 12 / 15 / 17 / 19 / 21 / 24 (double dots at 12 and 24). Fret spacing, string thickness and other visuals are detailed in DESIGN.md (created with Stitch)
 - **String count switch**: 6 / 7 / 8 / 9 in the toolbar. Switching loads that count's default (Standard) tuning, clears latches, and releases sounding notes
 - **Single-note playing**:

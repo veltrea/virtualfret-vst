@@ -103,6 +103,7 @@ juce::String VirtualFretState::toStateJson() const
     obj->setProperty ("inputHighlight", inputHighlight);
     obj->setProperty ("latchAudition", latchAudition);
     obj->setProperty ("visibleFrets", visibleFrets);
+    obj->setProperty ("leftHanded", leftHanded);
     obj->setProperty ("language", language);
 
     return juce::JSON::toString (juce::var (obj));
@@ -179,6 +180,7 @@ bool VirtualFretState::restoreFromStateJson (const juce::String& json)
     inputHighlight = getBool ("inputHighlight", true);
     latchAudition = getBool ("latchAudition", true);
     visibleFrets = juce::jlimit (5, kNumFrets, getInt ("visibleFrets", 18));
+    leftHanded = getBool ("leftHanded", false);
     language = obj->getProperty ("language").toString();
 
     return true;

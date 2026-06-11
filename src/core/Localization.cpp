@@ -39,6 +39,7 @@ namespace
             { "latchAudition",    { "Audition on latch",          "ラッチ時に試聴" } },
             { "strumSensitivity", { "Strum sensitivity",          "ストラム感度" } },
             { "visibleFrets",     { "Frets shown",                "表示フレット数" } },
+            { "leftHanded",       { "Left-handed mode",           "左利きモード" } },
             { "strumFixedVel",    { "Fixed strum velocity",       "ストラムを固定ベロシティに" } },
             { "strumHoldLight",   { "Strum light until release",  "ストラム点灯をリリースまで保持" } },
             { "language",         { "Language",                   "言語" } },
