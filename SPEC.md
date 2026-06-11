@@ -135,7 +135,7 @@ Toggled in the toolbar (default OFF).
   - **A string with no latch = muted (×)**: skipped during strums. The three states match a chord diagram's ×/○/fretted notation
 - **Latch audition**: latching or replacing a position immediately plays that note briefly (default ON, can be disabled)
 - **Clear**: a toolbar button clears all latches
-- Turning chord mode OFF **keeps** the latch state (restored on re-enable — an accidental toggle never destroys a built chord). Sounding notes are unaffected
+- Turning chord mode OFF **resets to neutral**: all latches are cleared and every sounding note is released, so nothing stays held or lit after the toggle
 - Latch state persists in the plugin state
 
 ## 9. Strum Zone

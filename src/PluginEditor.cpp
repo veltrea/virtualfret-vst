@@ -24,7 +24,17 @@ VirtualFretEditor::VirtualFretEditor (VirtualFretProcessor& processorIn)
     {
         {
             const juce::ScopedLock sl (virtualFret.getStateLock());
-            virtualFret.getModel().chordMode = on;   // latch is kept either way (SPEC §8)
+            auto& state = virtualFret.getModel();
+            state.chordMode = on;
+            if (! on)
+                state.resetLatch();   // SPEC §8: leaving chord mode resets to neutral
+        }
+        if (! on)
+        {
+            virtualFret.requestAllNotesOff();   // silence ringing strums too
+            currentForms.clearQuick();
+            formIndex = 0;
+            refreshFormLabel();
         }
         fretboard.repaint();
     };
