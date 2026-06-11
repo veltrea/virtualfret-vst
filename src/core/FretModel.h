@@ -43,7 +43,7 @@ struct VirtualFretState
     bool showNoteNames = false;
     bool inputHighlight = true;
     bool latchAudition = true;
-    int visibleFrets = kNumFrets;            // frets that fill the view (zoom); data is always 24
+    int visibleFrets = 18;                   // frets that fill the view (zoom); data is always 24
     juce::String language;                   // "en" / "ja"; empty = follow OS locale
 
     VirtualFretState();

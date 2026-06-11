@@ -66,7 +66,7 @@ Apply the full checklist from `vst3_midi_out_plugin.md`:
 - **Orientation**: headstock on the left, body (strum zone) on the right. Horizontal = frets, vertical = strings
 - **String order**: top = string 1 (highest), bottom = lowest string (same as tablature)
 - **Frets**: open (an open-string zone left of the nut) + frets 1–24
-- **Frets shown (zoom)**: a view option chooses how many frets fill the width (12 / 15 / 18 / 21 / 24, default 24). The data model always spans 24 frets — positions beyond the visible range still sound (strums, presets), they are just not drawn
+- **Frets shown (zoom)**: a view option chooses how many frets fill the width (12 / 15 / 18 / 21 / 24, default 18). The data model always spans 24 frets — positions beyond the visible range still sound (strums, presets), they are just not drawn
 - **Position markers**: 3 / 5 / 7 / 9 / 12 / 15 / 17 / 19 / 21 / 24 (double dots at 12 and 24). Fret spacing, string thickness and other visuals are detailed in DESIGN.md (created with Stitch)
 - **String count switch**: 6 / 7 / 8 / 9 in the toolbar. Switching loads that count's default (Standard) tuning, clears latches, and releases sounding notes
 - **Single-note playing**:

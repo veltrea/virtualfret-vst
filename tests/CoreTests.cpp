@@ -129,11 +129,11 @@ static void testStateJsonRoundTrip()
     EXPECT_EQ (restored.visibleFrets, 15);
     EXPECT_EQ (restored.language, juce::String ("ja"));
 
-    // Older states without the field keep the full 24-fret view.
+    // States without the field fall back to the default zoom (18).
     VirtualFretState legacy;
     EXPECT (legacy.restoreFromStateJson (
         R"({"numStrings": 6, "openNotes": [40,45,50,55,59,64]})"));
-    EXPECT_EQ (legacy.visibleFrets, kNumFrets);
+    EXPECT_EQ (legacy.visibleFrets, 18);
 
     // Malformed documents leave the state untouched.
     VirtualFretState untouched;
