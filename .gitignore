@@ -1,0 +1,5 @@
+build/
+external/JUCE/
+.DS_Store
+*.xcuserdatad
+dist/
