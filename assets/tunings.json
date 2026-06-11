@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "tunings": [
+    { "name": "Standard",                    "strings": [40, 45, 50, 55, 59, 64] },
+    { "name": "Half-step down (Eb)",         "strings": [39, 44, 49, 54, 58, 63] },
+    { "name": "Whole-step down (D Standard)", "strings": [38, 43, 48, 53, 57, 62] },
+    { "name": "Drop D",                      "strings": [38, 45, 50, 55, 59, 64] },
+    { "name": "Drop C#",                     "strings": [37, 44, 49, 54, 58, 63] },
+    { "name": "Drop C",                      "strings": [36, 43, 48, 53, 57, 62] },
+    { "name": "Drop B",                      "strings": [35, 42, 47, 52, 56, 61] },
+    { "name": "Open G",                      "strings": [38, 43, 50, 55, 59, 62] },
+    { "name": "Open D",                      "strings": [38, 45, 50, 54, 57, 62] },
+    { "name": "Open E",                      "strings": [40, 47, 52, 56, 59, 64] },
+    { "name": "Open A",                      "strings": [40, 45, 52, 57, 61, 64] },
+    { "name": "DADGAD",                      "strings": [38, 45, 50, 55, 57, 62] },
+    { "name": "Standard (B)",                "strings": [35, 40, 45, 50, 55, 59, 64] },
+    { "name": "Drop A",                      "strings": [33, 40, 45, 50, 55, 59, 64] },
+    { "name": "Standard (F#)",               "strings": [30, 35, 40, 45, 50, 55, 59, 64] },
+    { "name": "Drop E",                      "strings": [28, 35, 40, 45, 50, 55, 59, 64] },
+    { "name": "Standard (C#)",               "strings": [25, 30, 35, 40, 45, 50, 55, 59, 64] }
+  ]
+}
