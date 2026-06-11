@@ -10,7 +10,7 @@ On-screen MIDI keyboards are almost always piano-shaped, but what a guitarist ha
 
 VirtualFret puts the fingerboard itself on screen so that clicks and drags become MIDI directly. A guitarist who knows chord shapes by hand can enter them into the DAW from that same muscle memory.
 
-The technical foundation reuses the MIDI-output VST3 patterns established in NoteNamer (`/Volumes/DISK/dev/notenamer-vst`). Read `/Volumes/DISK/dev/knowledge/vst3_midi_out_plugin.md` before designing anything.
+The technical foundation reuses the MIDI-output VST3 patterns established in the NoteNamer project.
 
 ## 2. Goals
 

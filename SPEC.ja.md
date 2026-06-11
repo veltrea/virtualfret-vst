@@ -10,7 +10,7 @@
 
 本プラグインは指板そのものを画面に置き、クリック・ドラッグでそのまま MIDI を送れるようにする。コードシェイプを指で覚えているギタリストが、その記憶のまま DAW に入力できる。
 
-技術基盤は NoteNamer(`/Volumes/DISK/dev/notenamer-vst`)で確立した MIDI 送信 VST3 のパターンを全面再利用する。設計前に必ず `/Volumes/DISK/dev/knowledge/vst3_midi_out_plugin.md` を読むこと。
+技術基盤は NoteNamer プロジェクトで確立した MIDI 送信 VST3 のパターンを全面再利用する。
 
 ## 2. ゴール
 
