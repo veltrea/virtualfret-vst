@@ -98,6 +98,7 @@ juce::String VirtualFretState::toStateJson() const
     obj->setProperty ("strumVelMax", strumVelMax);
     obj->setProperty ("strumFixedVelocity", strumFixedVelocity);
     obj->setProperty ("keyboardStrumMs", keyboardStrumMs);
+    obj->setProperty ("strumHoldLight", strumHoldLight);
     obj->setProperty ("showNoteNames", showNoteNames);
     obj->setProperty ("inputHighlight", inputHighlight);
     obj->setProperty ("latchAudition", latchAudition);
@@ -172,6 +173,7 @@ bool VirtualFretState::restoreFromStateJson (const juce::String& json)
     strumVelMax = juce::jlimit (strumVelMin, 127, getInt ("strumVelMax", 127));
     strumFixedVelocity = getBool ("strumFixedVelocity", false);
     keyboardStrumMs = juce::jlimit (1, 200, getInt ("keyboardStrumMs", 15));
+    strumHoldLight = getBool ("strumHoldLight", false);
 
     showNoteNames = getBool ("showNoteNames", false);
     inputHighlight = getBool ("inputHighlight", true);

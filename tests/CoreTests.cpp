@@ -99,6 +99,7 @@ static void testStateJsonRoundTrip()
     state.strumVelMax = 110;
     state.strumFixedVelocity = true;
     state.keyboardStrumMs = 25;
+    state.strumHoldLight = true;
     state.showNoteNames = true;
     state.inputHighlight = false;
     state.latchAudition = false;
@@ -121,6 +122,7 @@ static void testStateJsonRoundTrip()
     EXPECT_EQ (restored.strumVelMax, 110);
     EXPECT (restored.strumFixedVelocity);
     EXPECT_EQ (restored.keyboardStrumMs, 25);
+    EXPECT (restored.strumHoldLight);
     EXPECT (restored.showNoteNames);
     EXPECT (! restored.inputHighlight);
     EXPECT (! restored.latchAudition);

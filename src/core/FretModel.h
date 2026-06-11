@@ -38,6 +38,7 @@ struct VirtualFretState
     int strumVelMax = 127;
     bool strumFixedVelocity = false;         // true: strums use `velocity` as-is
     int keyboardStrumMs = 15;                // per-string gap for Space strums
+    bool strumHoldLight = false;             // true: picked strings stay lit until mouse-up
 
     bool showNoteNames = false;
     bool inputHighlight = true;

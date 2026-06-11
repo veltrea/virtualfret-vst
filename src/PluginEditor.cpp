@@ -502,6 +502,7 @@ void VirtualFretEditor::showSettingsMenu()
     menu.addItem (2, i18n::tr (lang, "inputHighlight"), true, snapshot.inputHighlight);
     menu.addItem (3, i18n::tr (lang, "latchAudition"), true, snapshot.latchAudition);
     menu.addItem (4, i18n::tr (lang, "strumFixedVel"), true, snapshot.strumFixedVelocity);
+    menu.addItem (5, i18n::tr (lang, "strumHoldLight"), true, snapshot.strumHoldLight);
 
     juce::PopupMenu sensitivity;
     const float levels[] = { 0.5f, 1.0f, 2.0f, 4.0f };
@@ -538,6 +539,7 @@ void VirtualFretEditor::showSettingsMenu()
                     case 2: state.inputHighlight = ! state.inputHighlight; break;
                     case 3: state.latchAudition = ! state.latchAudition; break;
                     case 4: state.strumFixedVelocity = ! state.strumFixedVelocity; break;
+                    case 5: state.strumHoldLight = ! state.strumHoldLight; break;
                     case 10: state.strumSensitivity = 0.5f; break;
                     case 11: state.strumSensitivity = 1.0f; break;
                     case 12: state.strumSensitivity = 2.0f; break;

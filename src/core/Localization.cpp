@@ -40,6 +40,7 @@ namespace
             { "strumSensitivity", { "Strum sensitivity",          "ストラム感度" } },
             { "visibleFrets",     { "Frets shown",                "表示フレット数" } },
             { "strumFixedVel",    { "Fixed strum velocity",       "ストラムを固定ベロシティに" } },
+            { "strumHoldLight",   { "Strum light until release",  "ストラム点灯をリリースまで保持" } },
             { "language",         { "Language",                   "言語" } },
             { "langEnglish",      { "English",                    "English" } },
             { "langJapanese",     { "日本語",                    "日本語" } },

@@ -18,7 +18,9 @@ namespace virtualfret
 
     Strings flash amber for an instant when picked and fade right back
     (they do not stay lit while a note rings) so rapid up/down strokes
-    each read as their own hit.
+    each read as their own hit. With the hold-light option, picked
+    strings instead stay lit for the rest of the stroke and all go dark
+    on mouse-up.
 */
 class StrumZoneComponent : public juce::Component,
                            private juce::Timer
@@ -58,6 +60,8 @@ private:
 
     static constexpr double flashMs = 120.0;
     double hitAtMs[kMaxStrings] = {};   // absolute time of each string's last pick
+    bool litHeld[kMaxStrings] = {};     // hold-light mode: lit until mouse-up
+    bool holdLightStroke = false;       // option snapshot taken at mouse-down
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StrumZoneComponent)
 };

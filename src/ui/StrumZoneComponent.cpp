@@ -42,12 +42,20 @@ void StrumZoneComponent::paint (juce::Graphics& g)
 
         // Momentary pick flash, fading over flashMs — deliberately not
         // tied to the (let-ring) sounding state, which would leave every
-        // string lit after one downstroke.
+        // string lit after one downstroke. In hold-light mode a picked
+        // string stays fully lit until the mouse is released.
         auto colour = theme::c (theme::stringCol);
-        const double age = nowMs - hitAtMs[s];
-        if (age >= 0.0 && age < flashMs)
-            colour = colour.interpolatedWith (theme::c (theme::accent),
-                                              1.0f - (float) (age / flashMs));
+        if (litHeld[s])
+        {
+            colour = theme::c (theme::accent);
+        }
+        else
+        {
+            const double age = nowMs - hitAtMs[s];
+            if (age >= 0.0 && age < flashMs)
+                colour = colour.interpolatedWith (theme::c (theme::accent),
+                                                  1.0f - (float) (age / flashMs));
+        }
         g.setColour (colour);
         g.fillRect (0.0f, y - thickness * 0.5f, width, thickness);
     }
@@ -128,6 +136,11 @@ void StrumZoneComponent::mouseDown (const juce::MouseEvent& e)
     lastY = e.position.y;
     lastMs = strokeStartMs;
     crossedAny = false;
+
+    {
+        const juce::ScopedLock sl (processor.getStateLock());
+        holdLightStroke = processor.getModel().strumHoldLight;
+    }
 }
 
 void StrumZoneComponent::mouseDrag (const juce::MouseEvent& e)
@@ -172,7 +185,17 @@ void StrumZoneComponent::mouseDrag (const juce::MouseEvent& e)
     {
         const double tMs = lastMs + (double) ((crossing.lineY - y0) / (y1 - y0)) * dtMs;
         if (strumString (crossing.string, (float) (tMs - strokeStartMs), velocity))
-            markHit (crossing.string, 0.0);
+        {
+            if (holdLightStroke)
+            {
+                litHeld[crossing.string] = true;
+                repaint();
+            }
+            else
+            {
+                markHit (crossing.string, 0.0);
+            }
+        }
         crossedAny = true;
     }
 
@@ -186,6 +209,16 @@ void StrumZoneComponent::mouseUp (const juce::MouseEvent&)
     if (! crossedAny)
         processor.requestAllNotesOff();
     crossedAny = false;
+
+    // Hold-light mode: releasing the pick turns every lit string off.
+    bool anyLit = false;
+    for (auto lit : litHeld)
+        anyLit = anyLit || lit;
+    if (anyLit)
+    {
+        std::fill (std::begin (litHeld), std::end (litHeld), false);
+        repaint();
+    }
 }
 
 void StrumZoneComponent::performKeyboardStroke (bool downstroke)
