@@ -92,9 +92,9 @@ VirtualFretEditor::VirtualFretEditor (VirtualFretProcessor& processorIn)
     setResizable (true, true);
     // The floor is deliberately low: with a reduced fret zoom the board
     // stays usable as a Guitar-Pro-style slim strip; how cramped is
-    // acceptable is the user's call.
+    // acceptable is the user's call. New windows open at that floor.
     setResizeLimits (720, 170, 4000, 1400);
-    setSize (1180, 440);
+    setSize (720, 170);
     setWantsKeyboardFocus (true);
 
     refreshAll();

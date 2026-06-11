@@ -183,7 +183,7 @@ Example: F major = E-form moved to root F (string 6, fret 1) → actual frets `[
 
 - **Layout**: toolbar on top / headstock area (tuning display & editing) on the left / fretboard in the center / strum zone on the right edge
 - **Toolbar**: string count, tuning preset selector, chord-mode toggle, chord presets (root · type · form), clear, mute, velocity, channel mode, settings (note names / input highlight / latch audition / language)
-- Resizable window, landscape-oriented. The minimum size is kept deliberately low so the board can shrink to a slim Guitar-Pro-style fretboard strip — how cramped is acceptable is the user's call. Combine with the frets-shown zoom (§6) for compact layouts
+- Resizable window, landscape-oriented. The minimum size is kept deliberately low so the board can shrink to a slim Guitar-Pro-style fretboard strip — how cramped is acceptable is the user's call. Combine with the frets-shown zoom (§6) for compact layouts. **New windows open at that minimum size** (growing it is the user's move)
 - **Design**: follows DESIGN.md (a design system created with Google Stitch), expected to inherit the conventions of NoteNamer's "Ableton Live Native" system (dark grays + amber LED accents)
 - Keyboard: Esc = mute all. Space / Shift+Space = strum (M5). `EDITOR_WANTS_KEYBOARD_FOCUS TRUE`
 
