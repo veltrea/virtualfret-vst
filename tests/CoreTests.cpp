@@ -102,6 +102,7 @@ static void testStateJsonRoundTrip()
     state.showNoteNames = true;
     state.inputHighlight = false;
     state.latchAudition = false;
+    state.visibleFrets = 15;
     state.language = "ja";
 
     VirtualFretState restored;
@@ -123,7 +124,14 @@ static void testStateJsonRoundTrip()
     EXPECT (restored.showNoteNames);
     EXPECT (! restored.inputHighlight);
     EXPECT (! restored.latchAudition);
+    EXPECT_EQ (restored.visibleFrets, 15);
     EXPECT_EQ (restored.language, juce::String ("ja"));
+
+    // Older states without the field keep the full 24-fret view.
+    VirtualFretState legacy;
+    EXPECT (legacy.restoreFromStateJson (
+        R"({"numStrings": 6, "openNotes": [40,45,50,55,59,64]})"));
+    EXPECT_EQ (legacy.visibleFrets, kNumFrets);
 
     // Malformed documents leave the state untouched.
     VirtualFretState untouched;

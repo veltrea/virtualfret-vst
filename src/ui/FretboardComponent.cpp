@@ -22,21 +22,28 @@ FretboardComponent::FretboardComponent (VirtualFretProcessor& processorIn)
     setOpaque (true);
 }
 
-void FretboardComponent::rebuildFretPositions()
+void FretboardComponent::ensureGeometry (int visibleFrets)
 {
+    const int frets = juce::jlimit (5, kNumFrets, visibleFrets);
+    if (frets == builtFrets && juce::approximatelyEqual (builtWidth, (float) getWidth()))
+        return;
+
+    builtFrets = frets;
+    builtWidth = (float) getWidth();
+
     const float nutX = openZoneWidth;
-    const float boardW = juce::jmax (1.0f, (float) getWidth() - nutX);
+    const float boardW = juce::jmax (1.0f, builtWidth - nutX);
 
-    // fretX[f] = nut + boardW * (1 - r^f) / (1 - r^24)
-    const float full = 1.0f - std::pow (kFretShrink, (float) kNumFrets);
+    // The chosen zoom fills the width: fretX[f] = nut + boardW * (1 - r^f) / (1 - r^frets)
+    const float full = 1.0f - std::pow (kFretShrink, (float) builtFrets);
     fretX[0] = nutX;
-    for (int f = 1; f <= kNumFrets; ++f)
+    for (int f = 1; f <= builtFrets; ++f)
         fretX[f] = nutX + boardW * (1.0f - std::pow (kFretShrink, (float) f)) / full;
-}
 
-void FretboardComponent::resized()
-{
-    rebuildFretPositions();
+    // Park the out-of-view wires on the right edge so any stray index
+    // stays harmless.
+    for (int f = builtFrets + 1; f <= kNumFrets; ++f)
+        fretX[f] = fretX[builtFrets];
 }
 
 float FretboardComponent::cellCentreX (int fret) const
@@ -46,24 +53,27 @@ float FretboardComponent::cellCentreX (int fret) const
     return (fretX[fret - 1] + fretX[fret]) * 0.5f;
 }
 
-FretboardComponent::Cell FretboardComponent::cellAt (juce::Point<float> p) const
+FretboardComponent::Cell FretboardComponent::cellAt (juce::Point<float> p)
 {
     // Clamp instead of rejecting: a drag that wanders off the edges keeps
     // playing the nearest cell, like a finger that can't leave the neck.
     int numStrings = 6;
+    int visibleFrets = kNumFrets;
     {
         const juce::ScopedLock sl (processor.getStateLock());
         numStrings = processor.getModel().numStrings;
+        visibleFrets = processor.getModel().visibleFrets;
     }
+    ensureGeometry (visibleFrets);
 
     Cell cell;
     const int row = ui::rowFromY (juce::jlimit (0.0f, (float) getHeight() - 1.0f, p.y),
                                   numStrings, (float) getHeight());
     cell.string = ui::rowToString (row, numStrings);
 
-    const float x = juce::jlimit (0.0f, fretX[kNumFrets], p.x);
+    const float x = juce::jlimit (0.0f, fretX[builtFrets], p.x);
     cell.fret = 0;
-    for (int f = 1; f <= kNumFrets; ++f)
+    for (int f = 1; f <= builtFrets; ++f)
     {
         if (x > fretX[f - 1])
             cell.fret = f;
@@ -83,6 +93,7 @@ void FretboardComponent::paint (juce::Graphics& g)
     }
     const int numStrings = snapshot.numStrings;
     const auto height = (float) getHeight();
+    ensureGeometry (snapshot.visibleFrets);
 
     // -- board ------------------------------------------------------------
     g.fillAll (theme::c (theme::well));
@@ -90,7 +101,7 @@ void FretboardComponent::paint (juce::Graphics& g)
     g.fillRect (0.0f, 0.0f, openZoneWidth, height);
 
     // position markers (between fret wires, vertically centred)
-    for (int f = 1; f <= kNumFrets; ++f)
+    for (int f = 1; f <= builtFrets; ++f)
     {
         if (! isMarkerFret (f) && ! isDoubleMarkerFret (f))
             continue;
@@ -112,7 +123,7 @@ void FretboardComponent::paint (juce::Graphics& g)
 
     // fret wires + nut
     g.setColour (theme::c (theme::fretWire));
-    for (int f = 1; f <= kNumFrets; ++f)
+    for (int f = 1; f <= builtFrets; ++f)
         g.fillRect (fretX[f] - 1.0f, 0.0f, 2.0f, height);
     g.setColour (theme::c (theme::nut));
     g.fillRect (fretX[0] - 2.0f, 0.0f, 4.0f, height);
@@ -137,7 +148,7 @@ void FretboardComponent::paint (juce::Graphics& g)
         for (int s = 0; s < numStrings; ++s)
         {
             const float y = ui::stringRowY (ui::stringToRow (s, numStrings), numStrings, height);
-            for (int f = 0; f <= kNumFrets; ++f)
+            for (int f = 0; f <= builtFrets; ++f)
             {
                 const int note = snapshot.noteForCell (s, f);
                 if (note < 0)
@@ -157,7 +168,7 @@ void FretboardComponent::paint (juce::Graphics& g)
         for (int s = 0; s < numStrings; ++s)
         {
             const float y = ui::stringRowY (ui::stringToRow (s, numStrings), numStrings, height);
-            for (int f = 0; f <= kNumFrets; ++f)
+            for (int f = 0; f <= builtFrets; ++f)
             {
                 const int note = snapshot.noteForCell (s, f);
                 if (note >= 0 && processor.inputActive[(size_t) note].load (std::memory_order_relaxed))
@@ -190,7 +201,7 @@ void FretboardComponent::paint (juce::Graphics& g)
                 g.drawEllipse (openZoneWidth * 0.5f - dotR * 0.75f, y - dotR * 0.75f,
                                dotR * 1.5f, dotR * 1.5f, 1.8f);
             }
-            else
+            else if (fret <= builtFrets)
             {
                 g.setColour (theme::c (theme::accent).withAlpha (0.55f));
                 g.fillEllipse (cellCentreX (fret) - dotR, y - dotR, dotR * 2.0f, dotR * 2.0f);
@@ -205,18 +216,21 @@ void FretboardComponent::paint (juce::Graphics& g)
         if (note < 0 || s >= snapshot.openNotes.size())
             continue;
         const int fret = note - snapshot.openNotes[s];
-        if (fret < 0 || fret > kNumFrets)
+        if (fret < 0 || fret > builtFrets)
             continue;
 
         const float y = ui::stringRowY (ui::stringToRow (s, numStrings), numStrings, height);
         const float cx = cellCentreX (fret);
         g.setColour (theme::c (theme::accent));
         g.fillEllipse (cx - dotR, y - dotR, dotR * 2.0f, dotR * 2.0f);
-        g.setColour (juce::Colours::black.withAlpha (0.75f));
-        g.setFont (juce::Font { juce::FontOptions { 8.5f } });
-        g.drawText (pitchClassName (note % 12),
-                    juce::Rectangle<float> (cx - dotR, y - dotR, dotR * 2.0f, dotR * 2.0f),
-                    juce::Justification::centred);
+        if (dotR >= 6.5f)   // skip the label once rows get Guitar-Pro slim
+        {
+            g.setColour (juce::Colours::black.withAlpha (0.75f));
+            g.setFont (juce::Font { juce::FontOptions { 8.5f } });
+            g.drawText (pitchClassName (note % 12),
+                        juce::Rectangle<float> (cx - dotR, y - dotR, dotR * 2.0f, dotR * 2.0f),
+                        juce::Justification::centred);
+        }
     }
 
     // hover hint

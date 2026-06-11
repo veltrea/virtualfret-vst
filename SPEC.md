@@ -66,6 +66,7 @@ Apply the full checklist from `vst3_midi_out_plugin.md`:
 - **Orientation**: headstock on the left, body (strum zone) on the right. Horizontal = frets, vertical = strings
 - **String order**: top = string 1 (highest), bottom = lowest string (same as tablature)
 - **Frets**: open (an open-string zone left of the nut) + frets 1–24
+- **Frets shown (zoom)**: a view option chooses how many frets fill the width (12 / 15 / 18 / 21 / 24, default 24). The data model always spans 24 frets — positions beyond the visible range still sound (strums, presets), they are just not drawn
 - **Position markers**: 3 / 5 / 7 / 9 / 12 / 15 / 17 / 19 / 21 / 24 (double dots at 12 and 24). Fret spacing, string thickness and other visuals are detailed in DESIGN.md (created with Stitch)
 - **String count switch**: 6 / 7 / 8 / 9 in the toolbar. Switching loads that count's default (Standard) tuning, clears latches, and releases sounding notes
 - **Single-note playing**:
@@ -180,7 +181,7 @@ Example: F major = E-form moved to root F (string 6, fret 1) → actual frets `[
 
 - **Layout**: toolbar on top / headstock area (tuning display & editing) on the left / fretboard in the center / strum zone on the right edge
 - **Toolbar**: string count, tuning preset selector, chord-mode toggle, chord presets (root · type · form), clear, mute, velocity, channel mode, settings (note names / input highlight / latch audition / language)
-- Resizable window, landscape-oriented (mind the minimum height with 9 strings)
+- Resizable window, landscape-oriented. The minimum size is kept deliberately low so the board can shrink to a slim Guitar-Pro-style fretboard strip — how cramped is acceptable is the user's call. Combine with the frets-shown zoom (§6) for compact layouts
 - **Design**: follows DESIGN.md (a design system created with Google Stitch), expected to inherit the conventions of NoteNamer's "Ableton Live Native" system (dark grays + amber LED accents)
 - Keyboard: Esc = mute all. Space / Shift+Space = strum (M5). `EDITOR_WANTS_KEYBOARD_FOCUS TRUE`
 

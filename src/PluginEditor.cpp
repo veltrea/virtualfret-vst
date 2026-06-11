@@ -80,7 +80,10 @@ VirtualFretEditor::VirtualFretEditor (VirtualFretProcessor& processorIn)
     startTimerHz (30);
 
     setResizable (true, true);
-    setResizeLimits (980, 380, 4000, 1400);
+    // The floor is deliberately low: with a reduced fret zoom the board
+    // stays usable as a Guitar-Pro-style slim strip; how cramped is
+    // acceptable is the user's call.
+    setResizeLimits (720, 170, 4000, 1400);
     setSize (1180, 440);
     setWantsKeyboardFocus (true);
 
@@ -472,6 +475,13 @@ void VirtualFretEditor::showSettingsMenu()
                              juce::approximatelyEqual (snapshot.strumSensitivity, levels[i]));
     menu.addSubMenu (i18n::tr (lang, "strumSensitivity"), sensitivity);
 
+    juce::PopupMenu fretZoom;
+    const int fretChoices[] = { 12, 15, 18, 21, 24 };
+    for (int i = 0; i < 5; ++i)
+        fretZoom.addItem (30 + i, juce::String (fretChoices[i]), true,
+                          snapshot.visibleFrets == fretChoices[i]);
+    menu.addSubMenu (i18n::tr (lang, "visibleFrets"), fretZoom);
+
     juce::PopupMenu language;
     language.addItem (20, i18n::tr (lang, "langEnglish"), true, lang == i18n::Lang::en);
     language.addItem (21, i18n::tr (lang, "langJapanese"), true, lang == i18n::Lang::ja);
@@ -499,6 +509,11 @@ void VirtualFretEditor::showSettingsMenu()
                     case 13: state.strumSensitivity = 4.0f; break;
                     case 20: state.language = "en"; break;
                     case 21: state.language = "ja"; break;
+                    case 30: state.visibleFrets = 12; break;
+                    case 31: state.visibleFrets = 15; break;
+                    case 32: state.visibleFrets = 18; break;
+                    case 33: state.visibleFrets = 21; break;
+                    case 34: state.visibleFrets = 24; break;
                     default: break;
                 }
             }

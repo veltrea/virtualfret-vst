@@ -38,6 +38,7 @@ namespace
             { "inputHighlight",   { "Highlight input MIDI",       "入力 MIDI をハイライト" } },
             { "latchAudition",    { "Audition on latch",          "ラッチ時に試聴" } },
             { "strumSensitivity", { "Strum sensitivity",          "ストラム感度" } },
+            { "visibleFrets",     { "Frets shown",                "表示フレット数" } },
             { "strumFixedVel",    { "Fixed strum velocity",       "ストラムを固定ベロシティに" } },
             { "language",         { "Language",                   "言語" } },
             { "langEnglish",      { "English",                    "English" } },

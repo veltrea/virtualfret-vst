@@ -30,7 +30,6 @@ public:
     std::function<void()> onLatchEdited;
 
     void paint (juce::Graphics&) override;
-    void resized() override;
     void mouseDown (const juce::MouseEvent&) override;
     void mouseDrag (const juce::MouseEvent&) override;
     void mouseUp (const juce::MouseEvent&) override;
@@ -49,14 +48,19 @@ private:
         }
     };
 
-    Cell cellAt (juce::Point<float> p) const;
+    Cell cellAt (juce::Point<float> p);
     float cellCentreX (int fret) const;
-    void rebuildFretPositions();
+
+    /** Lazily rebuilds fret geometry when the zoom (visible frets) or
+        width changed — called at the top of paint and hit-testing. */
+    void ensureGeometry (int visibleFrets);
 
     VirtualFretProcessor& processor;
 
     float fretX[kNumFrets + 1] = {};   // fretX[0] = nut; fretX[f] = wire right of fret f
     float openZoneWidth = 46.0f;
+    int builtFrets = 0;                // last zoom the geometry was built for
+    float builtWidth = -1.0f;
 
     Cell pressed;              // melodic press in progress
     Cell hover;

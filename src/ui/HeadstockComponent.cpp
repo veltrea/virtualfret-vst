@@ -28,7 +28,8 @@ void HeadstockComponent::paint (juce::Graphics& g)
     }
 
     const auto height = (float) getHeight();
-    g.setFont (juce::Font { juce::FontOptions { 11.0f, juce::Font::bold } });
+    const float rowH = height / (float) juce::jmax (1, numStrings);
+    g.setFont (juce::Font { juce::FontOptions { juce::jmin (11.0f, rowH * 0.72f), juce::Font::bold } });
 
     for (int s = 0; s < numStrings && s < openNotes.size(); ++s)
     {
@@ -36,17 +37,20 @@ void HeadstockComponent::paint (juce::Graphics& g)
 
         g.setColour (theme::c (theme::accent));
         g.drawText (noteLabel (openNotes[s]),
-                    juce::Rectangle<float> (2.0f, y - 9.0f, (float) getWidth() - 16.0f, 18.0f),
+                    juce::Rectangle<float> (2.0f, y - rowH * 0.5f, (float) getWidth() - 16.0f, rowH),
                     juce::Justification::centred);
 
-        // +/- affordance arrows on the right edge
-        const float ax = (float) getWidth() - 9.0f;
-        juce::Path up, down;
-        up.addTriangle (ax - 3.5f, y - 3.0f, ax + 3.5f, y - 3.0f, ax, y - 8.0f);
-        down.addTriangle (ax - 3.5f, y + 3.0f, ax + 3.5f, y + 3.0f, ax, y + 8.0f);
-        g.setColour (theme::c (theme::textGhost));
-        g.fillPath (up);
-        g.fillPath (down);
+        // +/- affordance arrows; dropped once rows get too slim to fit them
+        if (rowH >= 17.0f)
+        {
+            const float ax = (float) getWidth() - 9.0f;
+            juce::Path up, down;
+            up.addTriangle (ax - 3.5f, y - 3.0f, ax + 3.5f, y - 3.0f, ax, y - 8.0f);
+            down.addTriangle (ax - 3.5f, y + 3.0f, ax + 3.5f, y + 3.0f, ax, y + 8.0f);
+            g.setColour (theme::c (theme::textGhost));
+            g.fillPath (up);
+            g.fillPath (down);
+        }
     }
 
     g.setColour (theme::c (theme::hairline));
